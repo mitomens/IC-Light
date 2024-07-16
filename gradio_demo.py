@@ -63,11 +63,11 @@ del sd_offset, sd_origin, sd_merged, keys
 
 # Device
 
-device = torch.device('cuda')
-text_encoder = text_encoder.to(device=device, dtype=torch.float16)
-vae = vae.to(device=device, dtype=torch.bfloat16)
-unet = unet.to(device=device, dtype=torch.float16)
-rmbg = rmbg.to(device=device, dtype=torch.float32)
+device = torch.device('cuda' if torch.cuda.is_available() else 'mps')
+text_encoder = text_encoder.to(device=device)
+vae = vae.to(device=device)
+unet = unet.to(device=device)
+rmbg = rmbg.to(device=device)
 
 # SDP
 
@@ -404,7 +404,7 @@ with block:
                     image_height = gr.Slider(label="Image Height", minimum=256, maximum=1024, value=640, step=64)
 
             with gr.Accordion("Advanced options", open=False):
-                steps = gr.Slider(label="Steps", minimum=1, maximum=100, value=25, step=1)
+                steps = gr.Slider(label="Steps", minimum=1, maximum=100, value=6, step=1)
                 cfg = gr.Slider(label="CFG Scale", minimum=1.0, maximum=32.0, value=2, step=0.01)
                 lowres_denoise = gr.Slider(label="Lowres Denoise (for initial latent)", minimum=0.1, maximum=1.0, value=0.9, step=0.01)
                 highres_scale = gr.Slider(label="Highres Scale", minimum=1.0, maximum=3.0, value=1.5, step=0.01)

@@ -63,11 +63,11 @@ del sd_offset, sd_origin, sd_merged, keys
 
 # Device
 
-device = torch.device('cuda')
-text_encoder = text_encoder.to(device=device, dtype=torch.float16)
-vae = vae.to(device=device, dtype=torch.bfloat16)
-unet = unet.to(device=device, dtype=torch.float16)
-rmbg = rmbg.to(device=device, dtype=torch.float32)
+device = torch.device('cuda' if torch.cuda.is_available() else 'mps')
+text_encoder = text_encoder.to(device=device)
+vae = vae.to(device=device)
+unet = unet.to(device=device)
+rmbg = rmbg.to(device=device)
 
 # SDP
 
