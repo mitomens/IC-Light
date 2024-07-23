@@ -238,12 +238,14 @@ def process(input_fg, prompt, image_width, image_height, num_samples, seed, step
 
     #変更
     def create_radial_gradient(image_width, image_height):
+        min_value = 50
         x = np.linspace(-1, 1, image_width)
         y = np.linspace(-1, 1, image_height)
         xx, yy = np.meshgrid(x, y)
         gradient = np.sqrt(xx**2 + yy**2)
         gradient = 1 - np.clip(gradient, 0, 1)  # center is bright (1), edges are dark (0)
-        return (gradient * 255).astype(np.uint8)
+        gradient = gradient * (255 - min_value) + min_value
+        return gradient.astype(np.uint8)
 
     if bg_source == BGSource.NONE:
         pass
