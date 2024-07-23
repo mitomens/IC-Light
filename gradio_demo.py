@@ -236,6 +236,15 @@ def process(input_fg, prompt, image_width, image_height, num_samples, seed, step
     bg_source = BGSource(bg_source)
     input_bg = None
 
+    #変更
+    def create_radial_gradient(image_width, image_height):
+        x = np.linspace(-1, 1, image_width)
+        y = np.linspace(-1, 1, image_height)
+        xx, yy = np.meshgrid(x, y)
+        gradient = np.sqrt(xx**2 + yy**2)
+        gradient = 1 - np.clip(gradient, 0, 1)  # center is bright (1), edges are dark (0)
+        return (gradient * 255).astype(np.uint8)
+
     if bg_source == BGSource.NONE:
         pass
     elif bg_source == BGSource.LEFT:
@@ -254,6 +263,10 @@ def process(input_fg, prompt, image_width, image_height, num_samples, seed, step
         gradient = np.linspace(0, 255, image_height)[:, None]
         image = np.tile(gradient, (1, image_width))
         input_bg = np.stack((image,) * 3, axis=-1).astype(np.uint8)
+    #変更
+    elif bg_source == BGSource.FRONT:
+        input_bg = create_radial_gradient(image_width, image_height)
+        input_bg = np.stack((input_bg,) * 3, axis=-1).astype(np.uint8)
     else:
         raise 'Wrong initial latent!'
 
@@ -339,7 +352,7 @@ def process(input_fg, prompt, image_width, image_height, num_samples, seed, step
 @torch.inference_mode()
 def process_relight(input_fg, prompt, image_width, image_height, num_samples, seed, steps, a_prompt, n_prompt, cfg, highres_scale, highres_denoise, lowres_denoise, bg_source):
     #背景削除をなくす
-    #input_fg, matting = run_rmbg(input_fg)
+    input_fg, matting = run_rmbg(input_fg)
     results = process(input_fg, prompt, image_width, image_height, num_samples, seed, steps, a_prompt, n_prompt, cfg, highres_scale, highres_denoise, lowres_denoise, bg_source)
     return input_fg, results
 
@@ -376,6 +389,8 @@ class BGSource(Enum):
     RIGHT = "Right Light"
     TOP = "Top Light"
     BOTTOM = "Bottom Light"
+    #変更
+    FRONT = "Front Light"
 
 
 block = gr.Blocks().queue()
