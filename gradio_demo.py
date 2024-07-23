@@ -237,6 +237,8 @@ def process(input_fg, prompt, image_width, image_height, num_samples, seed, step
     input_bg = None
 
     #変更
+    #縦横方向
+    """
     def create_radial_gradient(image_width, image_height):
         min_value = 50
         x = np.linspace(-1, 1, image_width)
@@ -246,6 +248,17 @@ def process(input_fg, prompt, image_width, image_height, num_samples, seed, step
         gradient = 1 - np.clip(gradient, 0, 1)  # center is bright (1), edges are dark (0)
         gradient = gradient * (255 - min_value) + min_value
         return gradient.astype(np.uint8)
+    """
+    
+    #横方向のみ
+    def create_horizontal_gradient(image_width, image_height):
+        min_value = 50
+        x = np.linspace(-1, 1, image_width)
+        gradient = 1 - np.clip(np.abs(x), 0, 1)  # center is bright (1), edges are dark (0)
+        gradient = gradient * (255 - min_value) + min_value
+        gradient = np.tile(gradient, (image_height, 1))  # Repeat the gradient for each row
+        return gradient.astype(np.uint8)
+
 
     if bg_source == BGSource.NONE:
         pass
@@ -267,7 +280,7 @@ def process(input_fg, prompt, image_width, image_height, num_samples, seed, step
         input_bg = np.stack((image,) * 3, axis=-1).astype(np.uint8)
     #変更
     elif bg_source == BGSource.FRONT:
-        input_bg = create_radial_gradient(image_width, image_height)
+        input_bg = create_horizontal_gradient(image_width, image_height)
         input_bg = np.stack((input_bg,) * 3, axis=-1).astype(np.uint8)
     else:
         raise 'Wrong initial latent!'
