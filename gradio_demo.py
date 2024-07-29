@@ -255,7 +255,7 @@ def process(input_fg, prompt, image_width, image_height, num_samples, seed, step
         min_value = 50
         x = np.linspace(-1, 1, image_width)
         gradient = 1 - np.clip(np.abs(x), 0, 1)  # center is bright (1), edges are dark (0)
-        gradient = gradient * (255 - min_value) + min_value
+        gradient = gradient * (230 - min_value) + min_value #元は255が最大
         gradient = np.tile(gradient, (image_height, 1))  # Repeat the gradient for each row
         return gradient.astype(np.uint8)
 
